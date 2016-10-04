@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TestGenerator {
@@ -181,6 +182,7 @@ public class TestGenerator {
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
+		targetGroup.registerRenderer(String.class, new ReplaceSingleQuotationRenderer());
 		generateCodeForFoldersInIndex(targetGroup);
 	}
 
@@ -320,5 +322,14 @@ public class TestGenerator {
 
 	protected void error(String message, Throwable throwable) {
 		System.err.println("ERROR: " + message);
+	}
+
+	public class ReplaceSingleQuotationRenderer extends StringRenderer
+	{
+		public String toString(Object o, String formatString, Locale locale) {
+			if (!("replaceSingleQuotation".equals(formatString)))
+				return super.toString(o, formatString, locale);
+			return ((String) o).replaceAll("^'|'$", "\"");
+		}
 	}
 }
