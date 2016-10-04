@@ -48,7 +48,7 @@ import org.stringtemplate.v4.StringRenderer;
 
 public class TestGenerator {
 	
-	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "Swift", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
 
 	/** Execute from antlr4 root dir:
 	 * *
