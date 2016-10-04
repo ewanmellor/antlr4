@@ -49,7 +49,7 @@ import java.util.Map;
 
 public class TestGenerator {
 	public final static String[] targets = {
-		"Java", "Go", "CSharp", "Python2", "Python3",
+		"Java", "Go", "CSharp", "Python2", "Python3", "Swift",
 		"JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox",
 		"JavaScript/Explorer", "JavaScript/Chrome"
 	};
