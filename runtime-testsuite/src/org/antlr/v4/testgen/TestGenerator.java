@@ -37,12 +37,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.gui.STViz;
+import org.stringtemplate.v4.StringRenderer;
 
 public class TestGenerator {
 	
@@ -299,5 +301,14 @@ public class TestGenerator {
 
 	protected void error(String message, Throwable throwable) {
 		System.err.println("ERROR: " + message);
+	}
+
+	public class ReplaceSingleQuotationRenderer extends StringRenderer
+	{
+		public String toString(Object o, String formatString, Locale locale) {
+			if (!("replaceSingleQuotation".equals(formatString)))
+				return super.toString(o, formatString, locale);
+			return ((String) o).replaceAll("^'|'$", "\"");
+		}
 	}
 }
