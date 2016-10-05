@@ -33,6 +33,6 @@ slaveGrammar(grammarName) ::= <<
 parser grammar S;
 type_ : 'int' ;
 decl : type_ ID ';'
-	| type_ ID init ';' {<write("\"JavaDecl: \" + $text")>};
-init : '=' INT;
+	| type_ ID initIt ';' {<write("\"JavaDecl: \" + $text")>};
+initIt : '=' INT;
 >>
