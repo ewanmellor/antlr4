@@ -66,11 +66,12 @@ public class TestParseTrees extends BaseTest {
 	public void testAltNum() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(202);
+		StringBuilder grammarBuilder = new StringBuilder(210);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("options { contextSuperClass=MyRuleNode; }\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("// TODO\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
