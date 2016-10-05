@@ -275,8 +275,8 @@ public class TestCompositeParsers extends BaseTest {
 			"parser grammar S;\n" +
 			"type_ : 'int' ;\n" +
 			"decl : type_ ID ';'\n" +
-			"	| type_ ID init ';' {Console.Write(\"JavaDecl: \" + $text);};\n" +
-			"init : '=' INT;";
+			"	| type_ ID init_ ';' {Console.Write(\"JavaDecl: \" + $text);};\n" +
+			"init_ : '=' INT;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(121);

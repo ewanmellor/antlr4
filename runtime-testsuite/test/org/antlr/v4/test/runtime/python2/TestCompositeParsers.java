@@ -344,8 +344,8 @@ public class TestCompositeParsers extends BasePython2Test {
 			"parser grammar S;\n" +
 			"type_ : 'int' ;\n" +
 			"decl : type_ ID ';'\n" +
-			"	| type_ ID init ';' {print(\"JavaDecl: \" + $text,end='')};\n" +
-			"init : '=' INT;";
+			"	| type_ ID init_ ';' {print(\"JavaDecl: \" + $text,end='')};\n" +
+			"init_ : '=' INT;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(121);
