@@ -438,3 +438,5 @@ isEmpty ::= [
 	"": true,
 	default: false
 ]
+
+OptionalValue(value) ::= "<value>"
