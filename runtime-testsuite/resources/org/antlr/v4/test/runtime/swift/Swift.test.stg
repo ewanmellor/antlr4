@@ -1,4 +1,7 @@
 IgnoredTests ::= [
+	"ParserExec.ReferenceToATN": true,
+    "ParserExec.ReferenceToATN_1": true,
+    "ParserExec.ReferenceToATN_2": true,
 	default: false
 ]
 
