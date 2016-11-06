@@ -18,7 +18,7 @@ Rule() ::= "a"
 
 grammar(grammarName) ::= <<
 grammar <grammarName>;
-a : (ID|Atn)* Atn? {<writeln("$text")>} ;
+a : (ID|ATN)* ATN? {<writeln("$text")>} ;
 ID : 'a'..'z'+ ;
 Atn : '0'..'9'+;
 WS : (' '|'\n') -> skip ;

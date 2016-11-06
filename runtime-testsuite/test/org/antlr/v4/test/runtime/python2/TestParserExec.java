@@ -751,7 +751,7 @@ public class TestParserExec extends BasePython2Test {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ATN)* ATN? {print($text)} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
-		grammarBuilder.append("ATN : '0'..'9'+;\n");
+		grammarBuilder.append("Atn : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -773,7 +773,7 @@ public class TestParserExec extends BasePython2Test {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ATN)* ATN? {print($text)} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
-		grammarBuilder.append("ATN : '0'..'9'+;\n");
+		grammarBuilder.append("Atn : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 
