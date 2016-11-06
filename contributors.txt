@@ -100,3 +100,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl
 2016/11/05, runner-mei, meifakun, runner.mei@gmail.com
 2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
+2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
