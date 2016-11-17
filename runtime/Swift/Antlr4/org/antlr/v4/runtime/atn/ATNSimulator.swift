@@ -137,7 +137,7 @@ open class ATNSimulator {
      * @deprecated Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#deserialize} instead.
      */
     ////@Deprecated
-    public static func deserialize(_ data: [Character]) throws -> ATN {
+    public static func deserialize(_ data: [Int]) throws -> ATN {
         return try ATNDeserializer().deserialize(data)
     }
 

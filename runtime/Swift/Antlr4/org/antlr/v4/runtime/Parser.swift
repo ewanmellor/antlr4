@@ -470,16 +470,16 @@ open class Parser: Recognizer<ParserATNSimulator> {
      */
 
     public func getATNWithBypassAlts() -> ATN {
-        let serializedAtn: String = getSerializedATN()
+        let serializedAtn: [Int] = getSerializedATN()
 
-        var result: ATN? = bypassAltsAtnCache[serializedAtn]
+        var result: ATN? = nil  // bypassAltsAtnCache[serializedAtn]
         synced(bypassAltsAtnCache) {
             [unowned self] in
             if result == nil {
                 let deserializationOptions: ATNDeserializationOptions = ATNDeserializationOptions()
                 try! deserializationOptions.setGenerateRuleBypassTransitions(true)
-                result = try!  ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn.characters))
-                self.bypassAltsAtnCache[serializedAtn] = result!
+                result = try!  ATNDeserializer(deserializationOptions).deserialize(serializedAtn)
+//                self.bypassAltsAtnCache[serializedAtn] = result!
             }
 
 

@@ -148,7 +148,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
      * <p>For interpreters, we don't know their serialized ATN despite having
      * created the interpreter from it.</p>
      */
-    open func getSerializedATN() -> String {
+    open func getSerializedATN() -> [Int] {
         RuntimeException("there is no serialized ATN")
         fatalError()
         ///throw  ANTLRError.UnsupportedOperation /* throw UnsupportedOperationException("there is no /serialized ATN"); */
