@@ -36,7 +36,7 @@ var _ = strconv.Itoa
 
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -60,7 +60,7 @@ Exit<lname; format="cap">(c *<lname; format="cap">Context)}; separator="\n\n">
 
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -96,7 +96,7 @@ func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; 
 
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -122,7 +122,7 @@ type <file.grammarName>Visitor interface {
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -519,6 +519,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
+p.GetErrorHandler().Sync(p)
 <if(choice.label)>
 <labelref(choice.label)> = p.GetTokenStream().LT(1)
 <endif>
@@ -544,6 +545,7 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
+p.GetErrorHandler().Sync(p)
 
 switch p.GetTokenStream().LA(1) {
 <if(choice.altLook && alts)>
@@ -561,6 +563,11 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 p.SetState(<choice.stateNumber>)
+<! TODO: this should not consume anything but does I think;
+ See TokenMismatch2 test, which fails w/o this sync.
+ But, see TestLeftRecursion.testJavaExpressions_10, 11 which fails with sync()
+ !>
+p.GetErrorHandler().Sync(p)
 <if(preamble)>
 <preamble; separator="\n">
 
@@ -833,10 +840,10 @@ catch (<catchArg>) {
 LexerSkipCommand() ::= "p.Skip()"
 LexerMoreCommand() ::= "p.More()"
 LexerPopModeCommand() ::= "p.PopMode()"
-LexerTypeCommand(arg) ::= "p.SetType(<arg>)"
-LexerChannelCommand(arg) ::= "p.SetChannel(<arg>)"
-LexerModeCommand(arg) ::= "p.SetMode(<arg>)"
-LexerPushModeCommand(arg) ::= "p.PushMode(<arg>)"
+LexerTypeCommand(arg, grammar)     ::= "p.SetType(<arg>)"
+LexerChannelCommand(arg, grammar)  ::= "p.SetChannel(<arg>)"
+LexerModeCommand(arg, grammar)     ::= "p.SetMode(<arg>)"
+LexerPushModeCommand(arg, grammar) ::= "p.PushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"

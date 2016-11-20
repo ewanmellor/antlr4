@@ -30,13 +30,20 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
+import org.junit.Before;
 import org.junit.Test;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseTest {
+public class TestActionTranslation extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
 		"parser grammar A;\n"+
@@ -168,6 +175,45 @@ public class TestActionTranslation extends BaseTest {
 		String expected = "(((AContext)_localctx).lab!=null?(((AContext)_localctx).lab.start):null); (((AContext)_localctx).c!=null?_input.getText(((AContext)_localctx).c.start,((AContext)_localctx).c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
+
+	/**
+	 * Regression test for issue #1295
+     * $e.v yields incorrect value 0 in "e returns [int v] : '1' {$v = 1;} | '(' e ')' {$v = $e.v;} ;"
+	 * https://github.com/antlr/antlr4/issues/1295
+	 */
+	@Test public void testRuleRefsRecursive() throws Exception {
+        String recursiveTemplate =
+            "recursiveTemplate(inline) ::= <<\n" +
+            "parser grammar A;\n"+
+            "e returns [int v]\n" +
+            "    :   INT {$v = $INT.int;}\n" +
+            "    |   '(' e ')' {\n" +
+            "		 #inline#<inline>#end-inline#\n" +
+            "		 }\n" +
+            "    ;\n" +
+            ">>";
+        String leftRecursiveTemplate =
+            "recursiveTemplate(inline) ::= <<\n" +
+            "parser grammar A;\n"+
+            "e returns [int v]\n" +
+            "    :   a=e op=('*'|'/') b=e  {$v = eval($a.v, $op.type, $b.v);}\n" +
+            "    |   INT {$v = $INT.int;}\n" +
+            "    |   '(' e ')' {\n" +
+            "		 #inline#<inline>#end-inline#\n" +
+            "		 }\n" +
+            "    ;\n" +
+            ">>";
+        // ref to value returned from recursive call to rule
+        String action = "$v = $e.v;";
+		String expected = "((EContext)_localctx).v =  ((EContext)_localctx).e.v;";
+		testActions(recursiveTemplate, "inline", action, expected);
+		testActions(leftRecursiveTemplate, "inline", action, expected);
+        // ref to predefined attribute obtained from recursive call to rule
+        action = "$v = $e.text.length();";
+        expected = "((EContext)_localctx).v =  (((EContext)_localctx).e!=null?_input.getText(((EContext)_localctx).e.start,((EContext)_localctx).e.stop):null).length();";
+		testActions(recursiveTemplate, "inline", action, expected);
+		testActions(leftRecursiveTemplate, "inline", action, expected);
+	}
 
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$ctx.text; $text";
