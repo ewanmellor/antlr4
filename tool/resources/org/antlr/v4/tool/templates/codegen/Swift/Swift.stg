@@ -234,15 +234,10 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <accessLevelOpenOK(parser)> class <parser.name>: <superClass; null="Parser"> {
 
-	internal static var _decisionToDFA: [DFA] = {
-          var decisionToDFA = [DFA]()
-          let length = <parser.name>._ATN.getNumberOfDecisions()
-          for i in 0..\<length {
-           <!// decisionToDFA[i] = DFA(<parser.name>._ATN.getDecisionState(i)!, i);!>
-            decisionToDFA.append(DFA(<parser.name>._ATN.getDecisionState(i)!, i))
-           }
-           return decisionToDFA
-     }()
+	internal static let _decisionToDFA: [DFA] =
+		<parser.name>._ATN.decisionToState.enumerated().map { x in
+			DFA(x.element, x.offset)
+		}
 
 	internal static let _sharedContextCache = PredictionContextCache()
 
@@ -958,15 +953,10 @@ import Antlr4
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <accessLevelOpenOK(lexer)> class <lexer.name>: <superClass; null="Lexer"> {
 
-	internal static var _decisionToDFA: [DFA] = {
-          var decisionToDFA = [DFA]()
-          let length = <lexer.name>._ATN.getNumberOfDecisions()
-          for i in 0..\<length {
-            <! decisionToDFA[i] = DFA(<lexer.name>._ATN.getDecisionState(i)!, i);!>
-          	    decisionToDFA.append(DFA(<lexer.name>._ATN.getDecisionState(i)!, i))
-          }
-           return decisionToDFA
-     }()
+	internal static let _decisionToDFA: [DFA] =
+		<lexer.name>._ATN.decisionToState.enumerated().map { x in
+			DFA(x.element, x.offset)
+		}
 
 	internal static let _sharedContextCache = PredictionContextCache()
 
