@@ -653,20 +653,20 @@ cases(ttypes) ::= <<
 InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>)
 <if(r.labels)>
-try {
+do {
 		let assignmentValue = try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 		<r.labels:{l | <labelref(l)> = assignmentValue} ; separator="\n">
-     }()
+     }
 <else>try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)<endif>
 >>
 
 MatchToken(m) ::= <<
 setState(<m.stateNumber>)
 <if(m.labels)>
-try {
+do {
 		let assignmentValue = try match(<parser.name>.Tokens.<m.name>.rawValue)
 		<m.labels:{l | <labelref(l)> = assignmentValue}  ; separator="\n">
-     }()
+     }
 <else>try match(<parser.name>.Tokens.<m.name>.rawValue)<endif>
 >>
 
