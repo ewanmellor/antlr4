@@ -48,6 +48,11 @@ public class TestSetInline extends SrcOp {
 			}
 
 			current.ttypes.add(factory.getGenerator().getTarget().getTokenTypeAsTargetLabel(factory.getGrammar(), ttype));
+			current.ttypeNums.add(ttype);
+		}
+
+		for (Bitset bitset : bitsetList) {
+			bitset.calcMask();
 		}
 
 		return bitsetList.toArray(new Bitset[bitsetList.size()]);
@@ -56,5 +61,28 @@ public class TestSetInline extends SrcOp {
 	public static final class Bitset {
 		public int shift;
 		public final List<String> ttypes = new ArrayList<String>();
+
+		/**
+		 * This contains the token numbers corresponding to this.ttypes.
+		 * This is only used while building the Bitset, and is
+		 * null otherwise (its information is rolled into this.mask).
+		 */
+		public List<Integer> ttypeNums = new ArrayList<Integer>();
+
+		/**
+		 * This is the bitmask corresponding to this set.
+		 * It is equal to the bitwise-or of 1 &lt;&lt; (ttype - shift)
+		 * for each entry in ttypes.
+		 */
+		public long mask;
+
+		void calcMask() {
+			long result = 0;
+			for (Integer i : ttypeNums) {
+				result |= 1L << (i - shift);
+			}
+			mask = result;
+			ttypeNums = null;
+		}
 	}
 }

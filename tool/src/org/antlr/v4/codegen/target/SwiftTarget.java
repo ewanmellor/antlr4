@@ -9,6 +9,7 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.model.TestSetInline;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -38,6 +39,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -182,6 +184,7 @@ public class SwiftTarget extends Target {
         if (result == null) {
             result = super.loadTemplates();
             result.registerRenderer(String.class, new SwiftStringRenderer(), true);
+            result.registerRenderer(TestSetInline.Bitset.class, new BitsetRenderer(), true);
             targetTemplates.set(result);
         }
 
@@ -551,6 +554,14 @@ public class SwiftTarget extends Target {
             return super.toString(o, formatString, locale);
         }
 
+    }
+
+    protected class BitsetRenderer implements AttributeRenderer {
+        @Override
+        public String toString(Object o, String formatString, Locale locale) {
+            TestSetInline.Bitset bitset = (TestSetInline.Bitset)o;
+            return "0x" + Long.toHexString(bitset.mask);
+        }
     }
 
 	@Override
