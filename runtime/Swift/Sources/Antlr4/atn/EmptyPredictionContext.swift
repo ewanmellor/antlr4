@@ -5,7 +5,7 @@
 /// 
 
 
-public class EmptyPredictionContext: SingletonPredictionContext {
+public final class EmptyPredictionContext: SingletonPredictionContext {
     public init() {
         super.init(nil, PredictionContext.EMPTY_RETURN_STATE)
     }

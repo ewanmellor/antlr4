@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Utils {
+public final class Utils {
 
     public static func escapeWhitespace(_ s: String, _ escapeSpaces: Bool) -> String {
         var buf = ""
