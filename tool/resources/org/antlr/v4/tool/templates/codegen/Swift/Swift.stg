@@ -232,7 +232,6 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-<!//@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})!>
 <accessLevelOpenOK(parser)> class <parser.name>: <superClass; null="Parser"> {
 
 	internal static var _decisionToDFA: [DFA] = {
@@ -290,7 +289,6 @@ case  <f.ruleIndex>:
 	return try <f.name>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
 	    default: return true
 		}
-		<!return true;!>
 	}
 	<sempredFuncs.values; separator="\n">
 <endif>
@@ -339,7 +337,6 @@ case <f.ruleIndex>:
 	return try <f.name>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
 	default: return true
 	}
-	<!return true;!>
 }
 <sempredFuncs.values; separator="\n">
 <endif>
@@ -386,7 +383,6 @@ private func <r.name>_sempred(_ _localctx: <r.ctxType>!,  _ predIndex: Int) thro
     case <index>:return <actions.(index)>}; separator="\n">
 	    default: return true
 	}
-	<!return true;!>
 }
 >>
 
@@ -836,7 +832,6 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 <accessLevelNotOpen(parser)> class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | <accessLevelOpenOK(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<! <if(ctorAttrs)> <accessLevelNotOpen(parser)> init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
 	<if(ctorAttrs)>
 	<accessLevelNotOpen(parser)> convenience init(_ parent: ParserRuleContext?, _ invokingState: Int<ctorAttrs:{a | , _ <a>}>) {
 		self.init(parent, invokingState)
@@ -849,7 +844,6 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 		return <parser.name>.RULE_<struct.derivedFromName>
 	}
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	<! <accessLevelNotOpen(parser)> init() { }!>
 	<accessLevelOpenOK(parser)>
 	func copyFrom(_ ctx: <struct.name>) {
 		super.copyFrom(ctx)
