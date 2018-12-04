@@ -630,13 +630,16 @@ default: false
 parserName(ttype) ::= <%
  <parser.name>.Tokens.<ttype>.rawValue
 %>
+tokenNumber(ttype) ::= <%
+ <parser.tokens.(ttype); null="-1">
+%>
 offsetShift(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> == <parser.name>.Tokens.<ttype>.rawValue}; separator=" || ">
+<bits.ttypes:{ttype | <s.varName> == <tokenNumber(ttype)>}; separator=" || ">
 %>
 
 cases(ttypes) ::= <<
@@ -658,10 +661,10 @@ MatchToken(m) ::= <<
 setState(<m.stateNumber>)
 <if(m.labels)>
 do {
-		let assignmentValue = try match(<parser.name>.Tokens.<m.name>.rawValue)
+		let assignmentValue = try match(<tokenNumber(m.name)>)
 		<m.labels:{l | <labelref(l)> = assignmentValue}  ; separator="\n">
      }
-<else>try match(<parser.name>.Tokens.<m.name>.rawValue)<endif>
+<else>try match(<tokenNumber(m.name)>)<endif>
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -766,19 +769,19 @@ RuleContextListDecl(rdecl) ::= "<rdecl.name>: [<rdecl.ctxName>] = [<rdecl.ctxNam
 ContextTokenGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <t.name>() -> TerminalNode? {
-		return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0)
+		return getToken(<tokenNumber(t.name)>, 0)
 	}
 >>
 ContextTokenListGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <t.name>() -> [TerminalNode] {
-		return getTokens(<parser.name>.Tokens.<t.name>.rawValue)
+		return getTokens(<tokenNumber(t.name)>)
 	}
 >>
 ContextTokenListIndexedGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <t.name>(_ i:Int) -> TerminalNode? {
-		return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
+		return getToken(<tokenNumber(t.name)>, i)
 	}
 >>
 ContextRuleGetterDecl(r) ::= <<
