@@ -64,8 +64,10 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
 
 
     public override func hash(into hasher: inout Hasher) {
-        hasher.combine(getActionType())
-        hasher.combine(channel)
+        var hash = MurmurHash.initialize()
+        hash = MurmurHash.update(hash, getActionType().rawValue)
+        hash = MurmurHash.update(hash, channel)
+        hasher.combine(MurmurHash.finish(hash, 2))
     }
 
     public var description: String {

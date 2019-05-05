@@ -95,9 +95,11 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         public override func hash(into hasher: inout Hasher) {
-            hasher.combine(ruleIndex)
-            hasher.combine(predIndex)
-            hasher.combine(isCtxDependent)
+            var hashCode = MurmurHash.initialize()
+            hashCode = MurmurHash.update(hashCode, ruleIndex)
+            hashCode = MurmurHash.update(hashCode, predIndex)
+            hashCode = MurmurHash.update(hashCode, isCtxDependent ? 1 : 0)
+            hasher.combine(MurmurHash.finish(hashCode, 3))
         }
 
         override
@@ -135,7 +137,9 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
 
         public override func hash(into hasher: inout Hasher) {
-            hasher.combine(precedence)
+            var hashCode: Int = 1
+            hashCode = 31 * hashCode + precedence
+            hasher.combine(hashCode)
         }
 
         override
@@ -208,7 +212,8 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
 
         public override func hash(into hasher: inout Hasher) {
-            hasher.combine(opnds)
+            let seed = 1554547125
+            hasher.combine(MurmurHash.hashCode(opnds, seed))
         }
 
         /// 
@@ -313,7 +318,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         public override func hash(into hasher: inout Hasher) {
-            hasher.combine(opnds)
+            hasher.combine(MurmurHash.hashCode(opnds, NSStringFromClass(OR.self).hashValue))
         }
 
         /// 
