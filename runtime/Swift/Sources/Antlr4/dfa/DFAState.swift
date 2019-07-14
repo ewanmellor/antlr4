@@ -110,9 +110,7 @@ public final class DFAState: Hashable, CustomStringConvertible {
 
 
     public func hash(into hasher: inout Hasher) {
-        var hash = MurmurHash.initialize(7)
-        hash = MurmurHash.update(hash, configs.hashValue)
-        hasher.combine(MurmurHash.finish(hash, 1))
+        hasher.combine(configs)
     }
 
     public var description: String {

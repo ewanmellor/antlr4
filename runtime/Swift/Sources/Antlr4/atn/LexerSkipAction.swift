@@ -57,9 +57,7 @@ public final class LexerSkipAction: LexerAction, CustomStringConvertible {
 
 
     public override func hash(into hasher: inout Hasher) {
-        var hash = MurmurHash.initialize()
-        hash = MurmurHash.update(hash, getActionType().rawValue)
-        hasher.combine(MurmurHash.finish(hash, 1))
+        hasher.combine(ObjectIdentifier(self))
     }
 
     public var description: String {

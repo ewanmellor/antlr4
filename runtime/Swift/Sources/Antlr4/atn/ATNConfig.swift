@@ -127,12 +127,10 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     }
 
     public func hash(into hasher: inout Hasher) {
-        var hashCode = MurmurHash.initialize(7)
-        hashCode = MurmurHash.update(hashCode, state.stateNumber)
-        hashCode = MurmurHash.update(hashCode, alt)
-        hashCode = MurmurHash.update(hashCode, context)
-        hashCode = MurmurHash.update(hashCode, semanticContext)
-        hasher.combine(MurmurHash.finish(hashCode, 4))
+        hasher.combine(state.stateNumber)
+        hasher.combine(alt)
+        hasher.combine(context)
+        hasher.combine(semanticContext)
     }
 
     public var description: String {

@@ -22,11 +22,9 @@ public class LookupATNConfig: Hashable {
     }
 
     public func hash(into hasher: inout Hasher) {
-        var hashCode: Int = 7
-        hashCode = 31 * hashCode + config.state.stateNumber
-        hashCode = 31 * hashCode + config.alt
-        hashCode = 31 * hashCode + config.semanticContext.hashValue
-        hasher.combine(hashCode)
+        hasher.combine(config.state.stateNumber)
+        hasher.combine(config.alt)
+        hasher.combine(config.semanticContext)
     }
 }
 

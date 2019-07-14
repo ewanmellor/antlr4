@@ -471,12 +471,10 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     public func hash(into hasher: inout Hasher) {
-        var hash = MurmurHash.initialize()
         for interval in intervals {
-            hash = MurmurHash.update(hash, interval.a)
-            hash = MurmurHash.update(hash, interval.b)
+            hasher.combine(interval.a)
+            hasher.combine(interval.b)
         }
-        hasher.combine(MurmurHash.finish(hash, intervals.count * 2))
     }
 
     /// 
