@@ -54,9 +54,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// 
     /// Used to shift left or right for a partial word mask
     /// 
-    private static let WORD_MASK: Int64 = Int64.max
-    //0xfffffffffffffff//-1
-    // 0xffffffffffffffffL;
+    private static let WORD_MASK = UInt64.max
 
     /// 
     /// -  bits long[]
@@ -70,28 +68,14 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// 
     /// The internal field corresponding to the serialField "bits".
     /// 
-    fileprivate var words: [Int64]
+    fileprivate var words: [UInt64]
 
     /// 
     /// The number of words in the logical size of this BitSet.
     /// 
     fileprivate var wordsInUse: Int = 0
-    //transient
 
-    /// 
-    /// Whether the size of "words" is user-specified.  If so, we assume
-    /// the user knows what he's doing and try harder to preserve it.
-    /// 
-    private var sizeIsSticky: Bool = false
-    //transient
-
-    /// 
-    /// use serialVersionUID from JDK 1.0.2 for interoperability
-    /// 
-    private let serialVersionUID: Int64 = 7997698588986878753
-    //L;
-
-    /// 
+    ///
     /// Given a bit index, return word index containing it.
     /// 
     private static func wordIndex(_ bitIndex: Int) -> Int {
@@ -130,10 +114,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Creates a new bit set. All bits are initially `false`.
     /// 
     public init() {
-        sizeIsSticky = false
-        words = [Int64](repeating: Int64(0), count: BitSet.wordIndex(BitSet.BITS_PER_WORD - 1) + 1)
-        //initWords(BitSet.BITS_PER_WORD);
-
+        words = [UInt64](repeating: 0, count: BitSet.wordIndex(BitSet.BITS_PER_WORD - 1) + 1)
     }
 
     /// 
@@ -149,25 +130,18 @@ public class BitSet: Hashable, CustomStringConvertible {
         // nbits can't be negative; size 0 is OK
 
         // words = [BitSet.wordIndex(nbits-1) + 1];
-        words = [Int64](repeating: Int64(0), count: BitSet.wordIndex(BitSet.BITS_PER_WORD - 1) + 1)
-        sizeIsSticky = true
+        words = [UInt64](repeating: 0, count: BitSet.wordIndex(BitSet.BITS_PER_WORD - 1) + 1)
         if nbits < 0 {
             throw ANTLRError.negativeArraySize(msg: "nbits < 0:\(nbits) ")
 
         }
-        // initWords(nbits);
     }
 
-    private func initWords(_ nbits: Int) {
-        // words =  [Int64](count: BitSet.wordIndex(BitSet.BITS_PER_WORD-1) + 1, repeatedValue: Int64(0));
-        //  words = [BitSet.wordIndex(nbits-1) + 1];
-    }
-
-    /// 
+    ///
     /// Creates a bit set using words as the internal representation.
     /// The last word (if there is one) must be non-zero.
     /// 
-    private init(_ words: [Int64]) {
+    private init(_ words: [UInt64]) {
         self.words = words
         self.wordsInUse = words.count
         checkInvariants()
@@ -186,12 +160,12 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - returns: a long array containing a little-endian representation
     /// of all the bits in this bit set
     /// 
-    public func toLongArray() -> [Int64] {
+    public func toLongArray() -> [UInt64] {
         return copyOf(words, wordsInUse)
     }
 
-    private func copyOf(_ words: [Int64], _ newLength: Int) -> [Int64] {
-        var newWords = [Int64](repeating: Int64(0), count: newLength)
+    private func copyOf(_ words: [UInt64], _ newLength: Int) -> [UInt64] {
+        var newWords = [UInt64](repeating: 0, count: newLength)
         let length = min(words.count, newLength)
         newWords[0 ..< length] = words[0 ..< length]
         return newWords
@@ -205,7 +179,6 @@ public class BitSet: Hashable, CustomStringConvertible {
             // Allocate larger of doubled size or required size
             let request: Int = max(2 * words.count, wordsRequired)
             words = copyOf(words, request)
-            sizeIsSticky = false
         }
     }
 
@@ -230,16 +203,12 @@ public class BitSet: Hashable, CustomStringConvertible {
     private static func checkRange(_ fromIndex: Int, _ toIndex: Int) throws {
         if fromIndex < 0 {
             throw ANTLRError.indexOutOfBounds(msg: "fromIndex < 0: \(fromIndex)")
-
         }
-
         if toIndex < 0 {
             throw ANTLRError.indexOutOfBounds(msg: "toIndex < 0: \(toIndex)")
-
         }
         if fromIndex > toIndex {
             throw ANTLRError.indexOutOfBounds(msg: "fromInde: \(fromIndex) > toIndex: \(toIndex)")
-
         }
     }
 
@@ -253,13 +222,12 @@ public class BitSet: Hashable, CustomStringConvertible {
     public func flip(_ bitIndex: Int) throws {
         if bitIndex < 0 {
             throw ANTLRError.indexOutOfBounds(msg: "bitIndex < 0: \(bitIndex)")
-
-
         }
-        let index: Int = BitSet.wordIndex(bitIndex)
+
+        let index = BitSet.wordIndex(bitIndex)
         expandTo(index)
 
-        words[index] ^= (Int64(1) << Int64(bitIndex % 64))
+        words[index] ^= (UInt64(1) << UInt64(bitIndex % 64))
 
         recalculateWordsInUse()
         checkInvariants()
@@ -283,13 +251,12 @@ public class BitSet: Hashable, CustomStringConvertible {
             return
         }
 
-        let startWordIndex: Int = BitSet.wordIndex(fromIndex)
-        let endWordIndex: Int = BitSet.wordIndex(toIndex - 1)
+        let startWordIndex = BitSet.wordIndex(fromIndex)
+        let endWordIndex = BitSet.wordIndex(toIndex - 1)
         expandTo(endWordIndex)
 
-        let firstWordMask: Int64 = BitSet.WORD_MASK << Int64(fromIndex % 64)
-        let lastWordMask: Int64 = BitSet.WORD_MASK >>> Int64(-toIndex)
-        //var lastWordMask : Int64  = WORD_MASK >>> Int64(-toIndex);
+        let firstWordMask = BitSet.WORD_MASK << UInt64(fromIndex % 64)
+        let lastWordMask = BitSet.WORD_MASK >> UInt64(-toIndex & BitSet.BIT_INDEX_MASK)
         if startWordIndex == endWordIndex {
             // Case 1: One word
             words[startWordIndex] ^= (firstWordMask & lastWordMask)
@@ -323,11 +290,10 @@ public class BitSet: Hashable, CustomStringConvertible {
             throw ANTLRError.indexOutOfBounds(msg: "bitIndex < 0: \(bitIndex)")
 
         }
-        let index: Int = BitSet.wordIndex(bitIndex)
+        let index = BitSet.wordIndex(bitIndex)
         expandTo(index)
 
-        // print(words.count)
-        words[index] |= (Int64(1) << Int64(bitIndex % 64))  // Restores invariants
+        words[index] |= (UInt64(1) << UInt64(bitIndex % 64))  // Restores invariants
 
         checkInvariants()
     }
@@ -365,13 +331,12 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
 
         // Increase capacity if necessary
-        let startWordIndex: Int = BitSet.wordIndex(fromIndex)
-        let endWordIndex: Int = BitSet.wordIndex(toIndex - 1)
+        let startWordIndex = BitSet.wordIndex(fromIndex)
+        let endWordIndex = BitSet.wordIndex(toIndex - 1)
         expandTo(endWordIndex)
 
-        let firstWordMask: Int64 = BitSet.WORD_MASK << Int64(fromIndex % 64)
-        let lastWordMask: Int64 = BitSet.WORD_MASK >>> Int64(-toIndex)
-        //var lastWordMask : Int64  = WORD_MASK >>>Int64( -toIndex);
+        let firstWordMask = BitSet.WORD_MASK << UInt64(fromIndex % 64)
+        let lastWordMask = BitSet.WORD_MASK >> UInt64(-toIndex & BitSet.BIT_INDEX_MASK)
         if startWordIndex == endWordIndex {
             // Case 1: One word
             words[startWordIndex] |= (firstWordMask & lastWordMask)
@@ -423,11 +388,11 @@ public class BitSet: Hashable, CustomStringConvertible {
         if bitIndex < 0 {
             throw ANTLRError.indexOutOfBounds(msg: "bitIndex < 0: \(bitIndex)")
         }
-        let index: Int = BitSet.wordIndex(bitIndex)
+        let index = BitSet.wordIndex(bitIndex)
         if index >= wordsInUse {
             return
         }
-        let option = Int64(1) << Int64(bitIndex % 64)
+        let option = UInt64(1) << UInt64(bitIndex % 64)
         words[index] &= ~option
 
         recalculateWordsInUse()
@@ -452,20 +417,19 @@ public class BitSet: Hashable, CustomStringConvertible {
             return
         }
 
-        let startWordIndex: Int = BitSet.wordIndex(fromIndex)
+        let startWordIndex = BitSet.wordIndex(fromIndex)
         if startWordIndex >= wordsInUse {
             return
         }
 
-        var endWordIndex: Int = BitSet.wordIndex(toIndex - 1)
+        var endWordIndex = BitSet.wordIndex(toIndex - 1)
         if endWordIndex >= wordsInUse {
             toIndex = length()
             endWordIndex = wordsInUse - 1
         }
 
-        let firstWordMask: Int64 = BitSet.WORD_MASK << Int64(fromIndex % 64)
-        // ar lastWordMask : Int64  = WORD_MASK >>> Int64((-toIndex);
-        let lastWordMask: Int64 = BitSet.WORD_MASK >>> Int64(-toIndex)
+        let firstWordMask = BitSet.WORD_MASK << UInt64(fromIndex % 64)
+        let lastWordMask = BitSet.WORD_MASK >> UInt64(-toIndex & BitSet.BIT_INDEX_MASK)
         if startWordIndex == endWordIndex {
             // Case 1: One word
             words[startWordIndex] &= ~(firstWordMask & lastWordMask)
@@ -515,10 +479,10 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
         checkInvariants()
 
-        let index: Int = BitSet.wordIndex(bitIndex)
+        let index = BitSet.wordIndex(bitIndex)
 
         return (index < wordsInUse)
-                && ((words[index] & ((Int64(1) << Int64(bitIndex % 64)))) != 0)
+                && ((words[index] & ((UInt64(1) << UInt64(bitIndex % 64)))) != 0)
     }
 
     /// 
@@ -538,11 +502,11 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         checkInvariants()
 
-        let len: Int = length()
+        let len = length()
 
         // If no set bits in range return empty bitset
         if len <= fromIndex || fromIndex == toIndex {
-            return try  BitSet(0)
+            return try BitSet(0)
         }
 
         // An optimization
@@ -550,16 +514,16 @@ public class BitSet: Hashable, CustomStringConvertible {
             toIndex = len
         }
 
-        let result: BitSet = try BitSet(toIndex - fromIndex)
-        let targetWords: Int = BitSet.wordIndex(toIndex - fromIndex - 1) + 1
-        var sourceIndex: Int = BitSet.wordIndex(fromIndex)
-        let wordAligned: Bool = (fromIndex & BitSet.BIT_INDEX_MASK) == 0
+        let result = try BitSet(toIndex - fromIndex)
+        let targetWords = BitSet.wordIndex(toIndex - fromIndex - 1) + 1
+        var sourceIndex = BitSet.wordIndex(fromIndex)
+        let wordAligned = (fromIndex & BitSet.BIT_INDEX_MASK) == 0
 
         // Process all words but the last word
-        var i: Int = 0;
+        var i = 0
         while i < targetWords - 1 {
-            let wordOption1: Int64 = (words[sourceIndex] >>> Int64(fromIndex))
-            let wordOption2: Int64 = (words[sourceIndex + 1] << Int64(-fromIndex % 64))
+            let wordOption1 = (words[sourceIndex] >> UInt64(fromIndex))
+            let wordOption2 = (words[sourceIndex + 1] << UInt64(-fromIndex % 64))
             let wordOption = wordOption1 | wordOption2
             result.words[i] = wordAligned ? words[sourceIndex] : wordOption
 
@@ -567,18 +531,17 @@ public class BitSet: Hashable, CustomStringConvertible {
             sourceIndex += 1
         }
         // Process the last word
-        // var lastWordMask : Int64 = WORD_MASK >>> Int64(-toIndex);
-        let lastWordMask: Int64 = BitSet.WORD_MASK >>> Int64(-toIndex)
+        let lastWordMask = BitSet.WORD_MASK >> UInt64(-toIndex & BitSet.BIT_INDEX_MASK)
         let toIndexTest = ((toIndex - 1) & BitSet.BIT_INDEX_MASK)
         let fromIndexTest = (fromIndex & BitSet.BIT_INDEX_MASK)
 
-        let wordOption1: Int64 = (words[sourceIndex] >>> Int64(fromIndex))
-        let wordOption2: Int64 = (words[sourceIndex + 1] & lastWordMask)
-        let wordOption3: Int64 = (64 + Int64(-fromIndex % 64))
+        let wordOption1 = (words[sourceIndex] >> UInt64(fromIndex))
+        let wordOption2 = (words[sourceIndex + 1] & lastWordMask)
+        let wordOption3 = (64 + UInt64(-fromIndex % 64))
         let wordOption = wordOption1 | wordOption2 << wordOption3
 
         let wordOption4 = (words[sourceIndex] & lastWordMask)
-        let wordOption5 = wordOption4 >>> Int64(fromIndex)
+        let wordOption5 = wordOption4 >> UInt64(fromIndex)
         result.words[targetWords - 1] =
                 toIndexTest < fromIndexTest
                 ? wordOption : wordOption5
@@ -620,16 +583,16 @@ public class BitSet: Hashable, CustomStringConvertible {
     public func nextSetBit(_ fromIndex: Int) throws -> Int {
         if fromIndex < 0 {
             throw ANTLRError.indexOutOfBounds(msg: "fromIndex < 0: \(fromIndex)")
-
         }
+
         checkInvariants()
 
-        var u: Int = BitSet.wordIndex(fromIndex)
+        var u = BitSet.wordIndex(fromIndex)
         if u >= wordsInUse {
             return -1
         }
 
-        var word: Int64 = words[u] & (BitSet.WORD_MASK << Int64(fromIndex % 64))
+        var word = words[u] & (BitSet.WORD_MASK << UInt64(fromIndex % 64))
 
         while true {
             if word != 0 {
@@ -644,19 +607,19 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
     }
 
-    public static func numberOfTrailingZeros(_ i: Int64) -> Int {
+    public static func numberOfTrailingZeros(_ i: UInt64) -> Int {
         // HD, Figure 5-14
-        var x: Int32, y: Int32
+        var x: UInt32, y: UInt32
         if i == 0 {
             return 64
         }
-        var n: Int32 = 63
-        y = Int32(truncatingIfNeeded: i)
+        var n: UInt32 = 63
+        y = UInt32(truncatingIfNeeded: i)
         if y != 0 {
             n = n - 32
             x = y
         } else {
-            x = Int32(truncatingIfNeeded: i >>> 32)
+            x = UInt32(truncatingIfNeeded: i >> 32)
         }
 
         y = x << 16
@@ -679,7 +642,7 @@ public class BitSet: Hashable, CustomStringConvertible {
             n = n - 2
             x = y
         }
-        return Int(n - ((x << 1) >>> 31))
+        return Int(n - ((x << 1) >> 31))
     }
 
     /// 
@@ -699,12 +662,12 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
         checkInvariants()
 
-        var u: Int = BitSet.wordIndex(fromIndex)
+        var u = BitSet.wordIndex(fromIndex)
         if u >= wordsInUse {
             return fromIndex
         }
 
-        var word: Int64 = ~words[u] & (BitSet.WORD_MASK << Int64(fromIndex % 64))
+        var word = ~words[u] & (BitSet.WORD_MASK << UInt64(fromIndex % 64))
 
         while true {
             if word != 0 {
@@ -746,17 +709,16 @@ public class BitSet: Hashable, CustomStringConvertible {
                 return -1
             }
             throw ANTLRError.indexOutOfBounds(msg: "fromIndex < -1: \(fromIndex)")
-
         }
 
         checkInvariants()
 
-        var u: Int = BitSet.wordIndex(fromIndex)
+        var u = BitSet.wordIndex(fromIndex)
         if u >= wordsInUse {
             return length() - 1
         }
 
-        var word: Int64 = words[u] & (BitSet.WORD_MASK >>> Int64(-(fromIndex + 1)))
+        var word = words[u] & (BitSet.WORD_MASK >> UInt64(-(fromIndex + 1)))
         while true {
             if word != 0 {
                 return (u + 1) * BitSet.BITS_PER_WORD - 1 - BitSet.numberOfLeadingZeros(word)
@@ -788,18 +750,16 @@ public class BitSet: Hashable, CustomStringConvertible {
                 return -1
             }
             throw ANTLRError.indexOutOfBounds(msg: "fromIndex < -1: \(fromIndex)")
-
         }
 
         checkInvariants()
 
-        var u: Int = BitSet.wordIndex(fromIndex)
+        var u = BitSet.wordIndex(fromIndex)
         if u >= wordsInUse {
             return fromIndex
         }
 
-        var word: Int64 = ~words[u] & (BitSet.WORD_MASK >>> Int64(-(fromIndex + 1)))
-        // var word : Int64 = ~words[u] & (WORD_MASK >>> -(fromIndex+1));
+        var word = ~words[u] & (BitSet.WORD_MASK >> UInt64(-(fromIndex + 1)))
 
         while true {
             if word != 0 {
@@ -813,36 +773,36 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
     }
 
-    public static func numberOfLeadingZeros(_ i: Int64) -> Int {
+    public static func numberOfLeadingZeros(_ i: UInt64) -> Int {
         // HD, Figure 5-6
         if i == 0 {
             return 64
         }
-        var n: Int32 = 1
-        var x = Int32(i >>> 32)
+        var n = 1
+        var x = UInt32(i >> 32)
         if x == 0 {
             n += 32
-            x = Int32(i)
+            x = UInt32(i)
         }
-        if x >>> 16 == 0 {
+        if x >> 16 == 0 {
             n += 16
             x <<= 16
         }
-        if x >>> 24 == 0 {
+        if x >> 24 == 0 {
             n += 8
             x <<= 8
         }
-        if x >>> 28 == 0 {
+        if x >> 28 == 0 {
             n += 4
             x <<= 4
         }
-        if x >>> 30 == 0 {
+        if x >> 30 == 0 {
             n += 2
             x <<= 2
         }
-        n -= x >>> 31
+        n -= Int(x >> 31)
 
-        return Int(n)
+        return n
     }
     /// 
     /// Returns the "logical size" of this `BitSet`: the index of
@@ -879,7 +839,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// the specified `BitSet`
     /// 
     public func intersects(_ set: BitSet) -> Bool {
-        var i: Int = min(wordsInUse, set.wordsInUse) - 1
+        var i = min(wordsInUse, set.wordsInUse) - 1
         while i >= 0 {
             if (words[i] & set.words[i]) != 0 {
                 return true
@@ -895,22 +855,22 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - returns: the number of bits set to `true` in this `BitSet`
     /// 
     public func cardinality() -> Int {
-        var sum: Int = 0
+        var sum = 0
         for i in 0..<wordsInUse {
             sum += BitSet.bitCount(words[i])
         }
         return sum
     }
 
-    public static func bitCount(_ i: Int64) -> Int {
+    public static func bitCount(_ i: UInt64) -> Int {
         var i = i
         // HD, Figure 5-14
-        i = i - ((i >>> 1) & 0x5555555555555555)
-        i = (i & 0x3333333333333333) + ((i >>> 2) & 0x3333333333333333)
-        i = (i + (i >>> 4)) & 0x0f0f0f0f0f0f0f0f
-        i = i + (i >>> 8)
-        i = i + (i >>> 16)
-        i = i + (i >>> 32)
+        i = i - ((i >> 1) & 0x5555555555555555)
+        i = (i & 0x3333333333333333) + ((i >> 2) & 0x3333333333333333)
+        i = (i + (i >> 4)) & 0x0f0f0f0f0f0f0f0f
+        i = i + (i >> 8)
+        i = i + (i >> 16)
+        i = i + (i >> 32)
 
         return Int(i) & 0x7f
     }
@@ -957,7 +917,7 @@ public class BitSet: Hashable, CustomStringConvertible {
             return
         }
 
-        let wordsInCommon: Int = min(wordsInUse, set.wordsInUse)
+        let wordsInCommon = min(wordsInUse, set.wordsInUse)
 
         if wordsInUse < set.wordsInUse {
             ensureCapacity(set.wordsInUse)
@@ -993,7 +953,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - parameter  set: a bit set
     /// 
     public func xor(_ set: BitSet) {
-        let wordsInCommon: Int = min(wordsInUse, set.wordsInUse)
+        let wordsInCommon = min(wordsInUse, set.wordsInUse)
 
         if wordsInUse < set.wordsInUse {
             ensureCapacity(set.wordsInUse)
@@ -1008,8 +968,6 @@ public class BitSet: Hashable, CustomStringConvertible {
         // Copy any remaining words
         if wordsInCommon < set.wordsInUse {
             words[wordsInCommon ..< wordsInUse] = set.words[wordsInCommon ..< wordsInUse]
-
-
         }
 
         recalculateWordsInUse()
@@ -1025,7 +983,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// 
     public func andNot(_ set: BitSet) {
         // Perform logical (a & !b) on words in common
-        var i: Int = min(wordsInUse, set.wordsInUse) - 1
+        var i = min(wordsInUse, set.wordsInUse) - 1
         while i >= 0 {
             words[i] &= ~set.words[i]
             i -= 1
@@ -1054,15 +1012,15 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - returns: the hash code value for this bit set
     /// 
     private var hashCode: Int {
-        var h: Int64 = 1234
-        var i: Int = wordsInUse
+        var h: UInt64 = 1234
+        var i = wordsInUse
         i -= 1
         while i >= 0 {
-             h ^= words[i] * Int64(i + 1)
+             h ^= words[i] * UInt64(i + 1)
              i -= 1
         }
 
-        return Int(Int32((h >> 32) ^ h))
+        return Int(UInt32((h >> 32) ^ h))
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -1081,10 +1039,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
 
-
-
-
-    /// 
+    ///
     /// Attempts to reduce internal storage used for the bits in this bit set.
     /// Calling this method may, but is not required to, affect the value
     /// returned by a subsequent call to the _#size()_ method.
@@ -1151,7 +1106,6 @@ public func ==(lhs: BitSet, rhs: BitSet) -> Bool {
         return true
     }
 
-
     lhs.checkInvariants()
     rhs.checkInvariants()
 
@@ -1168,5 +1122,4 @@ public func ==(lhs: BitSet, rhs: BitSet) -> Bool {
     }
 
     return true
-
 }
