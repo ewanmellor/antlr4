@@ -4,7 +4,8 @@
 /// can be found in the LICENSE.txt file in the project root.
 /// 
 
-import Foundation
+import class Foundation.NSUUID
+import struct Foundation.UUID
 
 
 extension UUID {

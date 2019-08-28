@@ -9,8 +9,6 @@
 /// error reporting and recovery in ANTLR parsers.
 /// 
 
-import Foundation
-
 open class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// 
     /// Indicates whether the error strategy is currently "recovering from an

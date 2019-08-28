@@ -6,8 +6,6 @@
 /// 
 /// 
 
-import Foundation
-
 ///
 /// This field maps from the serialized ATN string to the deserialized _org.antlr.v4.runtime.atn.ATN_ with
 /// bypass alternatives.

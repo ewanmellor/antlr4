@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/3.
 //
 
-import Foundation
-
 extension IntStream {
 
     /// 

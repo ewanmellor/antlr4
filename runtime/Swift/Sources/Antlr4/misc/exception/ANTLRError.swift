@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/4.
 //
 
-import Foundation
-
 public enum ANTLRError: Error {
     case unsupportedOperation(msg:String)
     case indexOutOfBounds(msg:String)

@@ -81,8 +81,6 @@
 /// first example shows.
 /// 
 
-import Foundation
-
 public class TokenStreamRewriter {
     public let DEFAULT_PROGRAM_NAME = "default"
     public static let PROGRAM_INIT_SIZE = 100
