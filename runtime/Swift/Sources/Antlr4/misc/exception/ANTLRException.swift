@@ -12,8 +12,6 @@
 //
 
 
-import Foundation
-
 public enum ANTLRException: Error {
     case parseCancellation(e: RecognitionException)
     case recognition(e: RecognitionException)

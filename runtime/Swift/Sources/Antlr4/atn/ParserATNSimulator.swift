@@ -233,7 +233,8 @@
 /// both SLL and LL parsing. Erroneous input will therefore require 2 passes over
 /// the input.
 /// 
-import Foundation
+import class Foundation.NSString
+import class Foundation.ProcessInfo
 
 open class ParserATNSimulator: ATNSimulator {
     public let debug = false

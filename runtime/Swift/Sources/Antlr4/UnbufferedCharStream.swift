@@ -4,7 +4,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import Foundation
+import class Foundation.InputStream
 
 
 /** Do not buffer up the entire char stream. It does keep a small buffer

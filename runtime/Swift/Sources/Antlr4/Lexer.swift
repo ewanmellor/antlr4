@@ -12,8 +12,6 @@
 /// of speed.
 /// 
 
-import Foundation
-
 open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     public static let EOF = -1
     public static let DEFAULT_MODE = 0

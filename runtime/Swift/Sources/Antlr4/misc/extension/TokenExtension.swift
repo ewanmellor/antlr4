@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/4.
 //
 
-import Foundation
-
 extension Token {
 
     static public var INVALID_TYPE: Int {

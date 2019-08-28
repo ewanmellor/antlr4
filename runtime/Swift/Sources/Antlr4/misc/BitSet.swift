@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/8.
 //
 
-import Foundation
-
 
 /// 
 /// This class implements a vector of bits that grows as needed. Each

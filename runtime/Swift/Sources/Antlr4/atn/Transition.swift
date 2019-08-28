@@ -19,8 +19,6 @@
 /// ATN transitions.
 /// 
 
-import Foundation
-
 public class Transition {
     // constants for serialization
     public static let EPSILON: Int = 1
