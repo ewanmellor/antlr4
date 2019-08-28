@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/22.
 //
 
-import Foundation
-
 public class LookupATNConfig: Hashable {
 
     public let config: ATNConfig

@@ -5,8 +5,6 @@
 /// 
 
 
-import Foundation
-
 open class ATNSimulator {
     ///
     /// Must distinguish between missing edge and edge we know leads nowhere

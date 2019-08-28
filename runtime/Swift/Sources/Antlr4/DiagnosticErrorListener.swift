@@ -25,8 +25,6 @@
 /// -  Sam Harwell
 /// 
 
-import Foundation
-
 public class DiagnosticErrorListener: BaseErrorListener {
     /// 
     /// When `true`, only exactly known ambiguities are reported.

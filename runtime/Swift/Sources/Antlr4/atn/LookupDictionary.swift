@@ -11,8 +11,6 @@
 //  Created by janyou on 15/9/23.
 //
 
-import Foundation
-
 public enum LookupDictionaryType: Int {
     case lookup = 0
     case ordered

@@ -11,7 +11,8 @@
 /// -  Sam Harwell
 /// 
 
-import Foundation
+import class Foundation.JSONSerialization
+import struct Foundation.UUID
 
 public class ATNDeserializer {
     public static let SERIALIZED_VERSION = 3

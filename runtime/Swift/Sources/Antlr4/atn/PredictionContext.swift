@@ -5,8 +5,6 @@
 /// 
 
 
-import Foundation
-
 public class PredictionContext: Hashable, CustomStringConvertible {
     /// 
     /// Represents `$` in local context prediction, which means wildcard.
