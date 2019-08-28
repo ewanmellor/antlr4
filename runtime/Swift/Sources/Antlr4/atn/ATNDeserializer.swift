@@ -138,7 +138,7 @@ public class ATNDeserializer {
                 ruleIndex = -1
             }
 
-            let s = try stateFactory(stype, ruleIndex)!
+            let s = try ATNDeserializer.stateFactory(stype, ruleIndex)
             if stype == ATNState.LOOP_END {
                 // special case
                 let loopBackStateNumber = toInt(data[p])
@@ -256,7 +256,7 @@ public class ATNDeserializer {
             let arg1 = toInt(data[p + 3])
             let arg2 = toInt(data[p + 4])
             let arg3 = toInt(data[p + 5])
-            let trans = try edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
+            let trans = try ATNDeserializer.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 
             let srcState = atn.states[src]!
             srcState.addTransition(trans)
@@ -302,7 +302,7 @@ public class ATNDeserializer {
                         data2 = -1
                     }
 
-                    let lexerAction = lexerActionFactory(actionType, data1, data2)
+                    let lexerAction = ATNDeserializer.lexerActionFactory(actionType, data1, data2)
                     lexerActions.append(lexerAction)
                 }
                 atn.lexerActions = lexerActions
@@ -405,7 +405,7 @@ public class ATNDeserializer {
         for state in states {
             let ruleIndex = state["ruleIndex"] as! Int
             let stype = state["stateType"] as! Int
-            let s = try stateFactory(stype, ruleIndex)!
+            let s = try ATNDeserializer.stateFactory(stype, ruleIndex)
             if stype == ATNState.LOOP_END {
                 // special case
                 let loopBackStateNumber = state["detailStateNumber"] as! Int
@@ -515,7 +515,7 @@ public class ATNDeserializer {
                 let arg1 = transition["arg1"] as! Int
                 let arg2 = transition["arg2"] as! Int
                 let arg3 = transition["arg3"] as! Int
-                let trans = try edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
+                let trans = try ATNDeserializer.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 
                 let srcState = atn.states[src]!
                 srcState.addTransition(trans)
@@ -549,7 +549,7 @@ public class ATNDeserializer {
                     let actionType = LexerActionType(rawValue: actionTypeValue)!
                     let data1 = lexerActionDict["a"] as! Int
                     let data2 = lexerActionDict["b"] as! Int
-                    let lexerAction = lexerActionFactory(actionType, data1, data2)
+                    let lexerAction = ATNDeserializer.lexerActionFactory(actionType, data1, data2)
                     lexerActions.append(lexerAction)
                 }
                 atn.lexerActions = lexerActions
@@ -861,10 +861,10 @@ public class ATNDeserializer {
     }
 
 
-    internal func edgeFactory(_ atn: ATN,
-                              _ type: Int, _ src: Int, _ trg: Int,
-                              _ arg1: Int, _ arg2: Int, _ arg3: Int,
-                              _ sets: [IntervalSet]) throws -> Transition {
+    private static func edgeFactory(_ atn: ATN,
+                                    _ type: Int, _ src: Int, _ trg: Int,
+                                    _ arg1: Int, _ arg2: Int, _ arg3: Int,
+                                    _ sets: [IntervalSet]) throws -> Transition {
         let target = atn.states[trg]!
         switch type {
         case Transition.EPSILON: return EpsilonTransition(target)
@@ -899,7 +899,7 @@ public class ATNDeserializer {
         }
     }
 
-    internal func stateFactory(_ type: Int, _ ruleIndex: Int) throws -> ATNState? {
+    private static func stateFactory(_ type: Int, _ ruleIndex: Int) throws -> ATNState? {
         var s: ATNState
         switch type {
         case ATNState.INVALID_TYPE: return nil
@@ -925,7 +925,7 @@ public class ATNDeserializer {
         return s
     }
 
-    internal func lexerActionFactory(_ type: LexerActionType, _ data1: Int, _ data2: Int) -> LexerAction {
+    private static func lexerActionFactory(_ type: LexerActionType, _ data1: Int, _ data2: Int) -> LexerAction {
         switch type {
         case .channel:
             return LexerChannelAction(data1)
@@ -952,4 +952,25 @@ public class ATNDeserializer {
             return LexerTypeAction(data1)
         }
     }
+}
+
+
+fileprivate func toInt(_ c: Character) -> Int {
+    return c.unicodeValue
+}
+
+fileprivate func toInt32(_ data: [Character], _ offset: Int) -> Int {
+    return data[offset].unicodeValue | (data[offset + 1].unicodeValue << 16)
+}
+
+fileprivate func toLong(_ data: [Character], _ offset: Int) -> Int64 {
+    let mask: Int64 = 0x00000000FFFFFFFF
+    let lowOrder: Int64 = Int64(toInt32(data, offset)) & mask
+    return lowOrder | Int64(toInt32(data, offset + 2) << 32)
+}
+
+fileprivate func toUUID(_ data: [Character], _ offset: Int) -> UUID {
+    let leastSigBits: Int64 = toLong(data, offset)
+    let mostSigBits: Int64 = toLong(data, offset + 4)
+    return UUID(mostSigBits: mostSigBits, leastSigBits: leastSigBits)
 }

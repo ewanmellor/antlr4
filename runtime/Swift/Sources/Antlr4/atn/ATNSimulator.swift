@@ -78,11 +78,4 @@ open class ATNSimulator {
                 sharedContextCache,
                 &visited)
     }
-
-    public static func edgeFactory(_ atn: ATN,
-                                  _ type: Int, _ src: Int, _ trg: Int,
-                                  _ arg1: Int, _ arg2: Int, _ arg3: Int,
-                                  _ sets: Array<IntervalSet>) throws -> Transition {
-        return try ATNDeserializer().edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets)
-    }
 }
