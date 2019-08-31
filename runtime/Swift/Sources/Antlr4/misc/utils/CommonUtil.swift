@@ -16,14 +16,6 @@ func errPrint(_ msg: String) {
     fputs(msg + "\n", stderr)
 }
 
-public func +(lhs: String, rhs: Int) -> String {
-    return lhs + String(rhs)
-}
-
-public func +(lhs: Int, rhs: String) -> String {
-    return String(lhs) + rhs
-}
-
 public func +(lhs: String, rhs: Token) -> String {
     return lhs + rhs.description
 }
@@ -57,19 +49,6 @@ func >>>(lhs: Int, rhs: Int) -> Int {
     return Int(bitPattern: left >> right)
 }
 
-func intChar2String(_ i: Int) -> String {
-    return String(Character(integerLiteral: i))
-}
-
-func log(_ message: String = "", file: String = #file, function: String = #function, lineNum: Int = #line) {
-
-    // #if DEBUG
-    print("FILE: \(URL(fileURLWithPath: file).pathComponents.last!),FUNC: \(function), LINE: \(lineNum) MESSAGE: \(message)")
-    //   #else
-    // do nothing
-    //   #endif
-}
-
 func toInt(_ c: Character) -> Int {
     return c.unicodeValue
 }
@@ -88,19 +67,4 @@ func toUUID(_ data: [Character], _ offset: Int) -> UUID {
     let leastSigBits: Int64 = toLong(data, offset)
     let mostSigBits: Int64 = toLong(data, offset + 4)
     return UUID(mostSigBits: mostSigBits, leastSigBits: leastSigBits)
-}
-
-func ==<T:Equatable>(_ lhs: [T?], _ rhs: [T?]) -> Bool {
-
-    if lhs.count != rhs.count {
-        return false
-    }
-
-    for i in 0..<lhs.count {
-        if lhs[i] != rhs[i] {
-            return false
-        }
-    }
-
-    return true
 }
