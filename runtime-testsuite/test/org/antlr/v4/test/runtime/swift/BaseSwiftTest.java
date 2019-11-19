@@ -7,6 +7,7 @@
 package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -231,7 +232,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		if (status != 0) {
-			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum.toString() + "\n" + stderrVacuum.toString());
+			String msg = String.format("Process exited with status %d:\n    workingDir: %s\n    command: %s\n%s\n%s", status, execPath, Utils.join(args, " "), stdoutVacuum.toString(), stderrVacuum.toString());
+			throw new IOException(msg);
 		}
 		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
 	}
@@ -242,7 +244,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Process p = builder.start();
 		int status = p.waitFor();
 		if (status != 0) {
-			throw new IOException("Process exited with status " + status);
+			String msg = String.format("Process exited with status %d:\n    workingDir: %s\n    command: %s", status, workingDir, Utils.join(command, " "));
+			throw new IOException(msg);
 		}
 	}
 
