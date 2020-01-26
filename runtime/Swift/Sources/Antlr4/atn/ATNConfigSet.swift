@@ -33,7 +33,9 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
     /// 
-    private var configLookup: LookupDictionary
+    private var configLookupExcludingContext = [ATNConfigExcludingContext : ATNConfigExcludingContext]()
+
+    private var configLookup = [ATNConfig : ATNConfig]()
 
     /// 
     /// Track the elements as they are added to the set; supports get(i)
@@ -66,10 +68,12 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     public let fullCtx: Bool
 
+    private let isOrdered: Bool
+
     private var cachedHashCode = -1
 
     public init(_ fullCtx: Bool = true, isOrdered: Bool = false) {
-        configLookup = isOrdered ? LookupDictionary(type: LookupDictionaryType.ordered) : LookupDictionary()
+        self.isOrdered = isOrdered
         self.fullCtx = fullCtx
     }
 
@@ -104,7 +108,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
             if config.getOuterContextDepth() > 0 {
                 dipsIntoOuterContext = true
             }
-            let existing: ATNConfig = getOrAdd(config)
+            let existing = getOrAdd(config)
             if existing === config {
                 // we added this new one
                 cachedHashCode = -1
@@ -132,8 +136,21 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public func getOrAdd(_ config: ATNConfig) -> ATNConfig {
+        if isOrdered {
+            return getOrAdd(from: &configLookup, config)
+        }
+        else {
+            let configWrapped = ATNConfigExcludingContext(config)
+            return getOrAdd(from: &configLookupExcludingContext, configWrapped).config
+        }
+    }
 
-        return configLookup.getOrAdd(config)
+    private func getOrAdd<T>(from: inout [T : T], _ config: T) -> T {
+        if let result = from[config] {
+            return result
+        }
+        from[config] = config
+        return config
     }
 
 
@@ -186,7 +203,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         if readonly {
             throw ANTLRError.illegalState(msg: "This set is readonly")
         }
-        if configLookup.isEmpty {
+        if configLookup.isEmpty && configLookupExcludingContext.isEmpty {
             return
         }
         for config in configs {
@@ -238,7 +255,13 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
 
 
     public func contains(_ o: ATNConfig) -> Bool {
-        return configLookup.contains(o)
+        if isOrdered {
+            return configLookup[o] != nil
+        }
+        else {
+            let oWrapped = ATNConfigExcludingContext(o)
+            return configLookupExcludingContext[oWrapped] != nil
+        }
     }
 
 
@@ -249,6 +272,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         configs.removeAll()
         cachedHashCode = -1
         configLookup.removeAll()
+        configLookupExcludingContext.removeAll()
     }
 
     public func isReadonly() -> Bool {
@@ -258,6 +282,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     public func setReadonly(_ readonly: Bool) {
         self.readonly = readonly
         configLookup.removeAll()
+        configLookupExcludingContext.removeAll()
 
     }
 
@@ -279,33 +304,21 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return buf
     }
 
-    /// 
-    /// override
-    /// public <T> func toArray(a : [T]) -> [T] {
-    /// return configLookup.toArray(a);
-    /// 
-    private func configHash(_ stateNumber: Int,_ context: PredictionContext?) -> Int{
-        var hashCode = MurmurHash.initialize(7)
-        hashCode = MurmurHash.update(hashCode, stateNumber)
-        hashCode = MurmurHash.update(hashCode, context)
-        return MurmurHash.finish(hashCode, 2)
-    }
-
     public func getConflictingAltSubsets() -> [BitSet] {
-        let length = configs.count
-        var configToAlts = [Int: BitSet]()
+        var configToAlts = [ATNConfigByStateAndContext : BitSet]()
 
-        for i in 0..<length {
-            let hash = configHash(configs[i].state.stateNumber, configs[i].context)
-            var alts: BitSet
-            if let configToAlt = configToAlts[hash] {
-                alts = configToAlt
-            } else {
+        for config in configs {
+            let wrappedConfig = ATNConfigByStateAndContext(config)
+            let alts: BitSet
+            if let a = configToAlts[wrappedConfig] {
+                alts = a
+            }
+            else {
                 alts = BitSet()
-                configToAlts[hash] = alts
+                configToAlts[wrappedConfig] = alts
             }
 
-            try! alts.set(configs[i].alt)
+            try! alts.set(config.alt)
         }
 
         return Array(configToAlts.values)

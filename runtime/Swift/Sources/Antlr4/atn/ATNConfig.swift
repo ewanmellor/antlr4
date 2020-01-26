@@ -133,10 +133,43 @@ public class ATNConfig: Hashable, CustomStringConvertible {
         hasher.combine(semanticContext)
     }
 
+    public func hashExcludingContext(into hasher: inout Hasher) {
+        hasher.combine(state.stateNumber)
+        hasher.combine(alt)
+        hasher.combine(semanticContext)
+    }
+
+    public func hashStateAndContext(into hasher: inout Hasher) {
+        hasher.combine(state.stateNumber)
+        hasher.combine(context)
+    }
+
+    public func equalsExcludingContext(other: ATNConfig) -> Bool {
+        if self === other {
+            return true
+        }
+
+        return
+            state.stateNumber == other.state.stateNumber &&
+                alt == other.alt &&
+                semanticContext == other.semanticContext
+    }
+
+    public func equalsByStateAndContext(other: ATNConfig) -> Bool {
+        if self === other {
+            return true
+        }
+
+        return
+            state.stateNumber == other.state.stateNumber &&
+                context == other.context
+    }
+
     public var description: String {
         //return "MyClass \(string)"
         return toString(nil, true)
     }
+
     public func toString<T>(_ recog: Recognizer<T>?, _ showAlt: Bool) -> String {
         var buf = "(\(state)"
         if showAlt {
@@ -203,4 +236,41 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
 
     return  lhs.semanticContext == rhs.semanticContext
 
+}
+
+
+/**
+ A wrapper for an ATNConfig, but where the equals and hash functions
+ exclude the context field.  This is used
+ */
+public final class ATNConfigExcludingContext: Hashable {
+    public let config: ATNConfig
+
+    public init(_ config: ATNConfig) {
+        self.config = config
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        config.hashExcludingContext(into: &hasher)
+    }
+}
+
+public func ==(lhs: ATNConfigExcludingContext, rhs: ATNConfigExcludingContext) -> Bool {
+    return lhs === rhs || lhs.config.equalsExcludingContext(other: rhs.config)
+}
+
+public final class ATNConfigByStateAndContext: Hashable {
+    public let config: ATNConfig
+
+    public init(_ config: ATNConfig) {
+        self.config = config
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        config.hashStateAndContext(into: &hasher)
+    }
+}
+
+public func ==(lhs: ATNConfigByStateAndContext, rhs: ATNConfigByStateAndContext) -> Bool {
+    return lhs === rhs || lhs.config.equalsByStateAndContext(other: rhs.config)
 }
