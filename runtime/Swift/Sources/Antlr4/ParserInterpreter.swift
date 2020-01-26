@@ -165,8 +165,8 @@ public class ParserInterpreter: Parser {
 
     override
     public func enterRecursionRule(_ localctx: ParserRuleContext, _ state: Int, _ ruleIndex: Int, _ precedence: Int) throws {
-        let pair: (ParserRuleContext?, Int) = (_ctx, localctx.invokingState)
-        _parentContextStack.push(pair)
+        let pair = (_ctx, localctx.invokingState)
+        _parentContextStack.append(pair)
         try super.enterRecursionRule(localctx, state, ruleIndex, precedence)
     }
 

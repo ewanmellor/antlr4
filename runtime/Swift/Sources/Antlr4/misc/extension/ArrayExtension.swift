@@ -39,61 +39,8 @@ extension Array {
     mutating func pop() -> Element {
         return removeLast()
     }
-    /// 
-    /// Same as append.
-    /// 
-    /// :param: newElement Element to append
-    /// 
-    mutating func push(_ newElement: Element) {
-        return append(newElement)
-    }
 
-    func all(_ test: (Element) -> Bool) -> Bool {
-        for item in self {
-            if !test(item) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-
-    /// 
-    /// Checks if test returns true for all the elements in self
-    /// 
-    /// :param: test Function to call for each element
-    /// :returns: True if test returns true for all the elements in self
-    /// 
-    func every(_ test: (Element) -> Bool) -> Bool {
-        for item in self {
-            if !test(item) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /// 
-    /// Checks if test returns true for any element of self.
-    /// 
-    /// :param: test Function to call for each element
-    /// :returns: true if test returns true for any element of self
-    /// 
-    func any(_ test: (Element) -> Bool) -> Bool {
-        for item in self {
-            if test(item) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-
-
-    /// 
+    ///
     /// slice array
     /// :param: index slice index
     /// :param: isClose is close array

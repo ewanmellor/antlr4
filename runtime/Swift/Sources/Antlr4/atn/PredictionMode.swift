@@ -388,12 +388,7 @@ public enum PredictionMode {
     /// _java.util.BitSet#cardinality cardinality_ 1, otherwise `false`
     /// 
     public static func hasNonConflictingAltSet(_ altsets: [BitSet]) -> Bool {
-        for alts: BitSet in altsets {
-            if alts.cardinality() == 1 {
-                return true
-            }
-        }
-        return false
+        return altsets.contains { $0.cardinality() == 1 }
     }
 
     /// 
@@ -405,12 +400,7 @@ public enum PredictionMode {
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
     public static func hasConflictingAltSet(_ altsets: [BitSet]) -> Bool {
-        for alts: BitSet in altsets {
-            if alts.cardinality() > 1 {
-                return true
-            }
-        }
-        return false
+        return altsets.contains { $0.cardinality() > 1 }
     }
 
     /// 
@@ -421,15 +411,8 @@ public enum PredictionMode {
     /// others, otherwise `false`
     /// 
     public static func allSubsetsEqual(_ altsets: [BitSet]) -> Bool {
-
-        let first: BitSet = altsets[0]
-        for it in altsets {
-            if it != first {
-                return false
-            }
-
-        }
-        return true
+        let first = altsets[0]
+        return altsets.allSatisfy { $0 == first }
     }
 
     /// 
@@ -440,7 +423,7 @@ public enum PredictionMode {
     /// - parameter altsets: a collection of alternative subsets
     /// 
     public static func getUniqueAlt(_ altsets: [BitSet]) -> Int {
-        let all: BitSet = getAlts(altsets)
+        let all = getAlts(altsets)
         if all.cardinality() == 1 {
             return all.firstSetBit()
         }
@@ -455,9 +438,9 @@ public enum PredictionMode {
     /// - parameter altsets: a collection of alternative subsets
     /// - returns: the set of represented alternatives in `altsets`
     /// 
-    public static func getAlts(_ altsets: Array<BitSet>) -> BitSet {
-        let all: BitSet = BitSet()
-        for alts: BitSet in altsets {
+    public static func getAlts(_ altsets: [BitSet]) -> BitSet {
+        let all = BitSet()
+        for alts in altsets {
             all.or(alts)
         }
         return all
@@ -487,12 +470,7 @@ public enum PredictionMode {
 
     public static func hasStateAssociatedWithOneAlt(_ configs: ATNConfigSet) -> Bool {
         let x = configs.getStateToAltMap()
-        for alts in x.values {
-            if alts.cardinality() == 1 {
-                return true
-            }
-        }
-        return false
+        return x.values.contains { $0.cardinality() == 1 }
     }
 
     public static func getSingleViableAlt(_ altsets: [BitSet]) -> Int {
